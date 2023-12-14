@@ -1,0 +1,27 @@
+{
+	"name": "write_single_airtable_record",
+	"description": "write a single record to airtable",
+	"parameters": {
+		"type": "object",
+		"properties": {
+			"base_id": {
+				"type": "string",
+				"description": "base_id of the airtable url, normally the first id from the url, e.g. in this url below, the basi _id is 'appj0J4gFpvLrQWjI',https://airtable.com/appj0J4gFpvLrQWjI/tblF40mG6oLjYtgZ\/viwmFx2ttAVrJm0E3? blocks=hide"
+			},
+			"table_id": {
+				"type": "string",
+				"description": "table_id of the airtable url, normally the second id from the url, e.g. in this url below, the basi_ _id is 'tblF40mG6oLjYtgZl', https://airtable.com/appj0J4gFpvLrQWjI/tblF 40mG6oLjYtgZ\/viwmFx2ttAVrJm0E3? blocks=hide"
+			},
+			"fields": {
+				"type": "object",
+				"description": "the data to be written, something like {'URL': 'https://www.website.com'}"
+			}
+			
+		},
+		"required": [
+			"base_id",
+			"table_id",
+			"fields"
+		]
+	}
+}

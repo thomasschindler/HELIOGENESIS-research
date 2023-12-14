@@ -1,0 +1,14 @@
+{
+	"name": "pdf_read_from_url",
+	"description": "get text content from a pdf based on url",
+	"parameters": {
+		"type": "object",
+		"properties": {
+			"url": {
+				"type": "string",
+				"description": "the url of pdf you want to get contents from"
+			}
+		},
+		"required": ["url"]
+	}
+}
