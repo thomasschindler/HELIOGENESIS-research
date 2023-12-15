@@ -4,7 +4,9 @@ import langchain
 import autogen
 import io
 import json
+import pyairtable
 
+from pyairtable import Api
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
 from bs4 import BeautifulSoup
@@ -104,61 +106,24 @@ def web_scraping(objective: str, url: str):
 
 # Function for get airtable records
 def get_airtable_records(base_id, table_id):
-    print("#########AIRTABLE READ")
-    url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
-
-    headers = {
-        'Authorization': f'Bearer {airtable_api_key}',
-    }
-
-    response = requests.request("GET", url, headers=headers)
-    data = response.json()
-    print(data)
-    return data
-
+    api = Api(airtable_api_key)
+    table = api.table(base_id, table_id)
+    return table.all()
 
 # Function for update airtable records
 
 def write_single_airtable_record(base_id, table_id, fields):
-    print("#########AIRTABLE WRITE")
-    url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
+    api = Api(airtable_api_key)
+    table = api.table(base_id, table_id)
+    return table.create(fields)
 
-    headers = {
-        'Authorization': f'Bearer {airtable_api_key}',
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "records": [{
-            "fields": fields
-        }]
-    }
-
-    response = requests.request("POST",url, headers=headers, data=json.dumps(data))
-    data = response.json()
-    return data
 
 # Function for update airtable records
 
-def update_single_airtable_record(base_id, table_id, id, fields):
-    print("#########AIRTABLE UPDATE")
-    url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
-
-    headers = {
-        'Authorization': f'Bearer {airtable_api_key}',
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "records": [{
-            "id": id,
-            "fields": fields
-        }]
-    }
-
-    response = requests.patch(url, headers=headers, data=json.dumps(data))
-    data = response.json()
-    return data
+def update_single_airtable_record(base_id, table_id, field_id, fields):
+    api = Api(airtable_api_key)
+    table = api.table(base_id, table_id)
+    return table.update(field_id,fields)
 
 # Function to read PDF files from an url
 def pdf_read_from_url(url: str):
