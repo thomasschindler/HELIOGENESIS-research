@@ -1,1 +1,0 @@
-# HELIOGENESIS-research
