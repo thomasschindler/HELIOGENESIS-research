@@ -1,0 +1,53 @@
+This thing attempts to 
+
+1) create a bunch of RAGs from PDF files listed in an airtable -> AIRTABLE_TABLE_RAG_ID 
+2) Then pull a list of questions up from -> AIRTABLE_TABLE_QUESTION_ID 
+3) answer each question from the perspective from each RAG including sources and store all of it to airtable -> AIRTABLE_TABLE_RESPONSE_ID 
+4) for each question read all the responses from airtable and generate one comprehensive answer including sources -> AIRTABLE_TABLE_FINAL_ID 
+
+To use it:
+
+0) create accounts on 
+serper
+browserless
+airtable
+
+1) pull the docker image di.hs.langchain 
+
+2) create the following tables on airtable 
+AIRTABLE_TABLE_RAG_ID [NAME, PDF, STATUS]
+AIRTABLE_TABLE_QUESTION_ID [QUESTION, STATUS]
+AIRTABLE_TABLE_RESPONSE_ID [NAME, RESPONSE, SOURCES]
+AIRTABLE_TABLE_FINAL_ID [QUESTION, ANSWER, SOURCES]
+
+2) populate .env with the following variables:
+SERP_API_KEY
+BROWSERLESS_API_KEY
+AIRTABLE_API_KEY
+AIRTABLE_BASE_ID
+AIRTABLE_TABLE_RAG_ID
+AIRTABLE_TABLE_QUESTION_ID
+AIRTABLE_TABLE_RESPONSE_ID
+AIRTABLE_TABLE_FINAL_ID
+
+3) run the container with the following docker-compose.yml
+
+version: '3.8'
+services:
+  team:
+    image: di.hs.langchain  # Use your local image
+    container_name: team  # Name of the container
+    command: sleep infinity  # Command to run the container indefinitely
+    volumes:
+      - /Users/x/Desktop/ASSISTANT/HELIOGENESIS-research/:/app/  # Mounts the host directory to the container
+    env_file:
+      - .env  # Load environment variables from the .env file
+    environment:
+      - SERP_API_KEY=${SERP_API_KEY}
+      - BROWSERLESS_API_KEY=${BROWSERLESS_API_KEY}
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+      - AIRTABLE_TABLE_RAG_ID=${AIRTABLE_TABLE_RAG_ID}
+      - AIRTABLE_TABLE_QUESTION_ID=${AIRTABLE_TABLE_QUESTION_ID}
+      - AIRTABLE_TABLE_RESPONSE_ID=${AIRTABLE_TABLE_RESPONSE_ID}
+      - AIRTABLE_TABLE_FINAL_ID=${AIRTABLE_TABLE_FINAL_ID}

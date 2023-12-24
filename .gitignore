@@ -2,3 +2,7 @@
 PYTHON/.env
 
 PYTHON/OAI_CONFIG_LIST
+
+.DS_Store
+
+INPUT/
