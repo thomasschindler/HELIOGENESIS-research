@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  team:
+    image: thomasschindler/di.hs.langchain  
+    env_file:
+      - .env  # Load environment variables from the .env file
+    container_name: team  # Name of the container
+    hostname: team  # Hostname inside the container
+    command: sleep infinity  # Command to run the container indefinitely
+    volumes:
+      - ${WORKDIR}:/app/  # Mounts the host directory to the container
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}

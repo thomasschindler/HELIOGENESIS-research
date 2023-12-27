@@ -8,6 +8,7 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.retrievers import MultiQueryRetriever
+from langchain.vectorstores import Chroma
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.output_parsers import PydanticOutputParser
@@ -41,11 +42,12 @@ class CustomChromaRetriever:
 
     def as_retriever(self):
         # Return the object that MultiQueryRetriever expects (this is speculative)
-        return self
+        print(self)
+        return self 
 
 
 # Set OpenAI API Key for embeddings and language model
-os.environ['OPENAI_API_KEY'] = "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"  # Replace with your actual API key
+os.environ['OPENAI_API_KEY'] = os.getenv("OPENAI_API_KEY")
 
 # Directory containing PDF documents
 pdf_directory = '/app/INPUT/'
@@ -89,27 +91,51 @@ for filename in os.listdir(pdf_directory):
         rags.append(model)
 
 
+
+
+
 # Choose one collection for the retriever (you can modify this to use multiple collections)
 # Initialize MultiQueryRetriever with the custom ChromaDB retriever
 #retriever = MultiQueryRetriever(retriever=CustomChromaRetriever(collections[0]), llm_chain=llm_chain)
 # Assuming llm_chain is already defined as in your current implementation
-retriever = MultiQueryRetriever.from_llm(
-    retriever=CustomChromaRetriever(collections[0]).as_retriever(),
-    llm_chain=llm_chain
+
+
+langchain_chroma = Chroma(
+    client=chromadb_client,
+    collection_name="656cc12f34244",    
+    #embedding_function=embedding_function,
 )
 
+retriever = MultiQueryRetriever.from_llm(
+    retriever=langchain_chroma.as_retriever(),
+    llm=model
+)
 
 # User-provided question
 user_question = "What are the latest advancements in AI?"
 
 # Let RAGs enter a conversation
 responses = []
+#todo: map the query to the rag (this loop should loop collections)
 for rag in rags:
     # Embed the user question
-    embedded_query = embedding.embed_query(user_question)
-    docs = retriever.get_relevant_documents(query=embedded_query, n_results=5)
-    context = " ".join([doc.page_content for doc in docs])
-    response = rag.generate(f"{context}\nQuestion: {user_question}")
+    #embedded_query = embedding.embed_query(user_question)
+    #print(embedded_query)
+    #docs = retriever.get_relevant_documents(query=embedded_query, n_results=5)
+    #context = " ".join([doc.page_content for doc in docs])
+
+
+    results = collection.query(
+        query_texts=[user_question],
+        n_results=5
+        )
+    
+    for document_set in results['documents']:
+        for document in document_set:
+            # Append each document's text to the all_documents_string variable
+            context_text += document + "\n\n"  # Add a space between documents for readability
+
+    response = rag.generate(f"{context_text}\nQuestion: {user_question}")
     responses.append(response)
 
 # Generate a structured summary from the conversation
